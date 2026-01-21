@@ -1,0 +1,166 @@
+.floating-word {
+  position: absolute;
+  color: white;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  filter: blur(1.2px);
+  user-select: none;
+  pointer-events: none;
+  transition: font-size 0.6s ease-out, opacity 0.6s ease-out, font-weight 0.6s ease-out;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.word-text {
+  display: inline-block;
+}
+
+.vote-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 50%;
+  color: #667eea;
+  font-weight: 600;
+  margin-left: 0.02em;
+  position: relative;
+  top: -0.15em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  text-shadow: none;
+  filter: blur(0px);
+  flex-shrink: 0;
+}
+
+/* Animation when word receives a vote - combine with existing animations */
+.floating-word.grow-animation:not(.center-word) {
+  animation: 
+    circular-orbit var(--orbit-duration, 20s) infinite ease-in-out,
+    jitter var(--jitter-duration, 4s) infinite ease-in-out,
+    vote-growth-orbiting 0.6s ease-out;
+}
+
+.floating-word.grow-animation.center-word {
+  animation: 
+    float-dreamy-subtle-discrete 30.72s infinite ease-in-out,
+    vote-growth 0.6s ease-out;
+}
+
+/* Animation when word becomes the center word */
+.floating-word.center-transition {
+  animation: center-transition 1s ease-out;
+}
+
+.floating-word.center-word {
+  pointer-events: auto;
+  filter: blur(0.8px);
+  animation: float-dreamy-subtle-discrete 30.72s infinite ease-in-out;
+  will-change: transform;
+}
+
+/* When center word has transition, pause the normal animation */
+.floating-word.center-word.center-transition {
+  animation: center-transition 1s ease-out;
+}
+
+.floating-word:not(.center-word) {
+  animation: 
+    circular-orbit var(--orbit-duration, 20s) infinite ease-in-out,
+    jitter var(--jitter-duration, 4s) infinite ease-in-out;
+  will-change: left, top, transform;
+}
+
+@keyframes circular-orbit {
+  0% {
+    left: var(--x0, 50%);
+    top: var(--y0, 50%);
+  }
+  25% {
+    left: var(--x25, 50%);
+    top: var(--y25, 50%);
+  }
+  50% {
+    left: var(--x50, 50%);
+    top: var(--y50, 50%);
+  }
+  75% {
+    left: var(--x75, 50%);
+    top: var(--y75, 50%);
+  }
+  100% {
+    left: var(--x100, 50%);
+    top: var(--y100, 50%);
+  }
+}
+
+@keyframes jitter {
+  0%, 100% {
+    transform: translate(-50%, -50%) translate(0px, 0px) scale(1);
+  }
+  20% {
+    transform: translate(-50%, -50%) translate(3px, -2px) scale(1.01);
+  }
+  40% {
+    transform: translate(-50%, -50%) translate(-2px, 3px) scale(0.99);
+  }
+  60% {
+    transform: translate(-50%, -50%) translate(2px, 2px) scale(1.01);
+  }
+  80% {
+    transform: translate(-50%, -50%) translate(-3px, -1px) scale(0.99);
+  }
+}
+
+@keyframes float-dreamy-subtle-discrete {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  25% {
+    transform: translate(calc(-50% + 4px), calc(-50% - 3px)) scale(1.01);
+  }
+  50% {
+    transform: translate(calc(-50% - 3px), calc(-50% + 4px)) scale(1);
+  }
+  75% {
+    transform: translate(calc(-50% + 3px), calc(-50% + 3px)) scale(0.99);
+  }
+}
+
+@keyframes vote-growth {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes vote-growth-orbiting {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes center-transition {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    filter: blur(1.2px);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+    filter: blur(0.5px);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    filter: blur(0.8px);
+  }
+}
