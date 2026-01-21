@@ -68,6 +68,14 @@ class WordStore {
     }
   }
 
+  resetAllVotes(): void {
+    // Reset all vote counts to 0
+    this.words.forEach((votes, word) => {
+      this.words.set(word, 0);
+    });
+    this.broadcastUpdate();
+  }
+
   private broadcastUpdate() {
     const words = this.getWords();
     const message = JSON.stringify({ type: 'words-update', words });

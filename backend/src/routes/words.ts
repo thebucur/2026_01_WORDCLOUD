@@ -40,4 +40,9 @@ router.post('/propose', (req: Request, res: Response) => {
   }
 });
 
+router.post('/reset-votes', (req: Request, res: Response) => {
+  wordStore.resetAllVotes();
+  res.json({ success: true, words: wordStore.getWords() });
+});
+
 export default router;
