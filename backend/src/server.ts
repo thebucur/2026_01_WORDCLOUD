@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
+import path from 'path';
 import wordsRouter from './routes/words';
 import { wordStore } from './store';
 
@@ -12,12 +13,26 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// API Routes
 app.use('/api/words', wordsRouter);
 
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
+});
+
+// Serve static files from frontend dist directory
+// When running from backend/, go up one level to project root, then to frontend/dist
+const frontendDistPath = path.resolve(process.cwd(), '..', 'frontend', 'dist');
+app.use(express.static(frontendDistPath));
+
+// Handle SPA routing - serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes
+  if (req.path.startsWith('/api') || req.path.startsWith('/ws')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  res.sendFile(path.join(frontendDistPath, 'index.html'));
 });
 
 // Create HTTP server
