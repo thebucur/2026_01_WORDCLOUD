@@ -62,7 +62,6 @@ const WordCloud = () => {
       {words.map((word, index) => {
         // Word is largest only if maxVotes > 1 (meaning at least one word has been voted)
         const isLargest = hasCenterWord && word.text === largestWord.text;
-        const position = positions.get(word.text);
         return (
           <FloatingWord
             key={word.text}
@@ -71,7 +70,6 @@ const WordCloud = () => {
             maxVotes={maxVotes}
             isLargest={isLargest}
             index={index}
-            position={position}
           />
         );
       })}

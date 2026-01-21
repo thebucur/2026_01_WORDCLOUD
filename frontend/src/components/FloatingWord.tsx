@@ -7,10 +7,9 @@ interface FloatingWordProps {
   maxVotes: number;
   isLargest: boolean;
   index: number;
-  position?: { x: number; y: number };
 }
 
-const FloatingWord = ({ word, votes, maxVotes, isLargest, index, position }: FloatingWordProps) => {
+const FloatingWord = ({ word, votes, maxVotes, isLargest, index }: FloatingWordProps) => {
   const wordRef = useRef<HTMLDivElement>(null);
   const [prevVotes, setPrevVotes] = useState(votes);
   const [prevIsLargest, setPrevIsLargest] = useState(isLargest);
