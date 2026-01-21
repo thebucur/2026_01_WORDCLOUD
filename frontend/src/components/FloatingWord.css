@@ -18,6 +18,7 @@
 
 .word-text {
   display: inline-block;
+  position: relative;
 }
 
 .vote-badge {
@@ -28,15 +29,15 @@
   border-radius: 50%;
   color: #667eea;
   font-weight: 600;
-  margin-left: 0.05em;
-  position: relative;
+  position: absolute;
+  left: calc(100% + 0.05em);
   top: -0.25em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   text-shadow: none;
   filter: blur(0px);
   flex-shrink: 0;
   z-index: 10;
-  /* Ensure badge is never clipped - use relative positioning instead of absolute */
+  /* Badge is now absolutely positioned relative to word-text to not affect centering */
 }
 
 /* Animation when word receives a vote - combine with existing animations */

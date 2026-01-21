@@ -7,9 +7,10 @@ interface FloatingWordProps {
   maxVotes: number;
   isLargest: boolean;
   index: number;
+  onInitialized?: (word: string) => void;
 }
 
-const FloatingWord = ({ word, votes, maxVotes, isLargest, index }: FloatingWordProps) => {
+const FloatingWord = ({ word, votes, maxVotes, isLargest, index, onInitialized }: FloatingWordProps) => {
   const wordRef = useRef<HTMLDivElement>(null);
   const [prevVotes, setPrevVotes] = useState(votes);
   const [prevIsLargest, setPrevIsLargest] = useState(isLargest);
@@ -17,6 +18,7 @@ const FloatingWord = ({ word, votes, maxVotes, isLargest, index }: FloatingWordP
   const [shouldAnimateCenter, setShouldAnimateCenter] = useState(false);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const centerAnimationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasNotifiedInitRef = useRef(false);
 
   // Detect vote changes and center transitions
   useEffect(() => {
@@ -204,6 +206,12 @@ const FloatingWord = ({ word, votes, maxVotes, isLargest, index }: FloatingWordP
             if (!currentOrbit || currentOrbit !== `${config.baseDuration}s`) {
               wordRef.current.style.setProperty('--orbit-duration', `${config.baseDuration}s`);
             }
+            
+            // Notify parent that this word is initialized
+            if (!hasNotifiedInitRef.current && onInitialized) {
+              hasNotifiedInitRef.current = true;
+              onInitialized(word);
+            }
           }
         });
       }
@@ -216,6 +224,12 @@ const FloatingWord = ({ word, votes, maxVotes, isLargest, index }: FloatingWordP
           if (wordRef.current && isLargest) {
             wordRef.current.style.left = '50%';
             wordRef.current.style.top = '50%';
+            
+            // Notify parent that this word is initialized (center words don't have delay)
+            if (!hasNotifiedInitRef.current && onInitialized) {
+              hasNotifiedInitRef.current = true;
+              onInitialized(word);
+            }
           }
         });
       }
