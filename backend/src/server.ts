@@ -6,7 +6,7 @@ import wordsRouter from './routes/words';
 import { wordStore } from './store';
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
