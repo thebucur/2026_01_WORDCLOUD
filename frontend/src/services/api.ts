@@ -19,3 +19,8 @@ export const proposeWord = async (word: string): Promise<Word[]> => {
   const response = await api.post<{ success: boolean; words: Word[] }>('/words/propose', { word });
   return response.data.words;
 };
+
+export const resetVotes = async (): Promise<Word[]> => {
+  const response = await api.post<{ success: boolean; words: Word[] }>('/words/reset-votes');
+  return response.data.words;
+};

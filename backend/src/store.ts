@@ -38,8 +38,7 @@ class WordStore {
 
   getWords(): Word[] {
     return Array.from(this.words.entries())
-      .map(([text, votes]) => ({ text, votes }))
-      .sort((a, b) => b.votes - a.votes);
+      .map(([text, votes]) => ({ text, votes }));
   }
 
   voteWord(word: string): boolean {
@@ -69,9 +68,9 @@ class WordStore {
   }
 
   resetAllVotes(): void {
-    // Reset all vote counts to 0
+    // Reset all vote counts to 1
     this.words.forEach((votes, word) => {
-      this.words.set(word, 0);
+      this.words.set(word, 1);
     });
     this.broadcastUpdate();
   }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Word } from '../types/word';
-import { getWords, voteWord, proposeWord } from '../services/api';
+import { getWords, voteWord, proposeWord, resetVotes } from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import './VotingPage.css';
 
@@ -12,7 +12,7 @@ const VotingPage = () => {
   const navigate = useNavigate();
 
   const handleWordsUpdate = useCallback((newWords: Word[]) => {
-    setWords(newWords.sort((a, b) => b.votes - a.votes));
+    setWords(newWords);
   }, []);
 
   // Listen for real-time updates via WebSocket
@@ -25,7 +25,7 @@ const VotingPage = () => {
   const loadWords = async () => {
     try {
       const wordsData = await getWords();
-      setWords(wordsData.sort((a, b) => b.votes - a.votes));
+      setWords(wordsData);
     } catch (error) {
       console.error('Error loading words:', error);
     }
@@ -60,6 +60,24 @@ const VotingPage = () => {
     } catch (error) {
       console.error('Error proposing word:', error);
       alert('Eroare la propunerea cuvântului. Te rugăm să încerci din nou.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetVotes = async () => {
+    if (!window.confirm('Ești sigur că vrei să resetezi toate voturile?')) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await resetVotes();
+      // Stay on voting page - words will update via WebSocket
+      await new Promise(resolve => setTimeout(resolve, 100));
+    } catch (error) {
+      console.error('Error resetting votes:', error);
+      alert('Eroare la resetarea voturilor. Te rugăm să încerci din nou.');
     } finally {
       setLoading(false);
     }
@@ -115,9 +133,18 @@ const VotingPage = () => {
           </form>
         </div>
 
-        <button onClick={() => navigate('/')} className="back-button">
-          ← Înapoi la Word Cloud
-        </button>
+        <div className="actions-section">
+          <button 
+            onClick={handleResetVotes} 
+            disabled={loading}
+            className="reset-button"
+          >
+            Resetează toate voturile
+          </button>
+          <button onClick={() => navigate('/')} className="back-button">
+            ← Înapoi la Word Cloud
+          </button>
+        </div>
       </div>
     </div>
   );

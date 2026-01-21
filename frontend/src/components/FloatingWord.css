@@ -5,10 +5,15 @@
   filter: blur(1.2px);
   user-select: none;
   pointer-events: none;
-  transition: font-size 0.6s ease-out, opacity 0.6s ease-out, font-weight 0.6s ease-out;
+  transition: font-size 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              font-weight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   display: inline-flex;
   align-items: flex-start;
+  transform-origin: center center;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 .word-text {
@@ -23,27 +28,32 @@
   border-radius: 50%;
   color: #667eea;
   font-weight: 600;
-  margin-left: 0.02em;
+  margin-left: 0.05em;
   position: relative;
-  top: -0.15em;
+  top: -0.25em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   text-shadow: none;
   filter: blur(0px);
   flex-shrink: 0;
+  z-index: 10;
+  /* Ensure badge is never clipped - use relative positioning instead of absolute */
 }
 
 /* Animation when word receives a vote - combine with existing animations */
+/* Use animation-play-state to ensure base animations continue smoothly */
 .floating-word.grow-animation:not(.center-word) {
   animation: 
     circular-orbit var(--orbit-duration, 20s) infinite ease-in-out,
     jitter var(--jitter-duration, 4s) infinite ease-in-out,
-    vote-growth-orbiting 0.6s ease-out;
+    vote-growth-orbiting 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation-fill-mode: both;
 }
 
 .floating-word.grow-animation.center-word {
   animation: 
     float-dreamy-subtle-discrete 30.72s infinite ease-in-out,
-    vote-growth 0.6s ease-out;
+    vote-growth 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation-fill-mode: both;
 }
 
 /* Animation when word becomes the center word */
@@ -56,6 +66,9 @@
   filter: blur(0.8px);
   animation: float-dreamy-subtle-discrete 30.72s infinite ease-in-out;
   will-change: transform;
+  /* Ensure center word is properly centered */
+  left: 50% !important;
+  top: 50% !important;
 }
 
 /* When center word has transition, pause the normal animation */
@@ -67,7 +80,7 @@
   animation: 
     circular-orbit var(--orbit-duration, 20s) infinite ease-in-out,
     jitter var(--jitter-duration, 4s) infinite ease-in-out;
-  will-change: left, top, transform;
+  will-change: transform;
 }
 
 @keyframes circular-orbit {
@@ -116,13 +129,13 @@
     transform: translate(-50%, -50%) scale(1);
   }
   25% {
-    transform: translate(calc(-50% + 4px), calc(-50% - 3px)) scale(1.01);
+    transform: translate(-50%, -50%) scale(1.01);
   }
   50% {
-    transform: translate(calc(-50% - 3px), calc(-50% + 4px)) scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
   75% {
-    transform: translate(calc(-50% + 3px), calc(-50% + 3px)) scale(0.99);
+    transform: translate(-50%, -50%) scale(0.99);
   }
 }
 
@@ -131,7 +144,7 @@
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.15);
+    transform: translate(-50%, -50%) scale(1.12);
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
@@ -143,7 +156,7 @@
     transform: translate(-50%, -50%) scale(1);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.2);
+    transform: translate(-50%, -50%) scale(1.15);
   }
   100% {
     transform: translate(-50%, -50%) scale(1);
@@ -156,8 +169,8 @@
     filter: blur(1.2px);
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
-    filter: blur(0.5px);
+    transform: translate(-50%, -50%) scale(1.15) rotate(4deg);
+    filter: blur(0.6px);
   }
   100% {
     transform: translate(-50%, -50%) scale(1) rotate(0deg);
