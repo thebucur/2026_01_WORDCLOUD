@@ -15,10 +15,10 @@ const QRCode = () => {
       <div className="qr-code-wrapper">
         <QRCodeSVG
           value={voteUrl}
-          size={120}
+          size={256}
           level="M"
-          bgColor="rgba(255, 255, 255, 0.9)"
-          fgColor="#667eea"
+          bgColor="#ffffff"
+          fgColor="#000000"
         />
         <div className="qr-code-label">Scanează pentru a vota</div>
       </div>

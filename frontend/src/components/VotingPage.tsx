@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Word } from '../types/word';
 import { getWords, voteWord } from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
@@ -11,7 +10,6 @@ const VotingPage = () => {
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
-  const navigate = useNavigate();
 
   const handleWordsUpdate = useCallback((newWords: Word[]) => {
     setWords(newWords);
@@ -96,12 +94,6 @@ const VotingPage = () => {
               ))}
             </div>
           )}
-        </div>
-
-        <div className="actions-section">
-          <button onClick={() => navigate('/')} className="back-button">
-            ← Înapoi la Word Cloud
-          </button>
         </div>
       </div>
     </div>
