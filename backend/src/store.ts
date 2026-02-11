@@ -75,6 +75,26 @@ class WordStore {
     this.broadcastUpdate();
   }
 
+  deleteWord(word: string): boolean {
+    const normalizedWord = word.trim().toLowerCase();
+    if (this.words.has(normalizedWord)) {
+      this.words.delete(normalizedWord);
+      this.broadcastUpdate();
+      return true;
+    }
+    return false;
+  }
+
+  getStats(): { totalWords: number; totalVotes: number; words: Word[] } {
+    const words = this.getWords();
+    const totalVotes = words.reduce((sum, word) => sum + word.votes, 0);
+    return {
+      totalWords: words.length,
+      totalVotes,
+      words: words.sort((a, b) => b.votes - a.votes), // Sort by votes descending
+    };
+  }
+
   private broadcastUpdate() {
     const words = this.getWords();
     const message = JSON.stringify({ type: 'words-update', words });

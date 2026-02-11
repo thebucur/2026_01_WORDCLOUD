@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Word } from '../types/word';
-import { getWords, voteWord, proposeWord, resetVotes } from '../services/api';
+import { getWords, voteWord } from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import './VotingPage.css';
 
+const VOTED_KEY = 'wordcloud_voted';
+
 const VotingPage = () => {
   const [words, setWords] = useState<Word[]>([]);
-  const [newWord, setNewWord] = useState('');
   const [loading, setLoading] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
   const navigate = useNavigate();
 
   const handleWordsUpdate = useCallback((newWords: Word[]) => {
@@ -20,6 +22,11 @@ const VotingPage = () => {
 
   useEffect(() => {
     loadWords();
+    // Check if user has already voted
+    const voted = localStorage.getItem(VOTED_KEY);
+    if (voted === 'true') {
+      setHasVoted(true);
+    }
   }, []);
 
   const loadWords = async () => {
@@ -32,12 +39,22 @@ const VotingPage = () => {
   };
 
   const handleVote = async (word: string) => {
+    // Check if user has already voted
+    if (hasVoted) {
+      alert('Ai votat deja! Poți vota doar o singură dată.');
+      return;
+    }
+
     setLoading(true);
     try {
       await voteWord(word);
+      // Mark user as voted
+      localStorage.setItem(VOTED_KEY, 'true');
+      setHasVoted(true);
       // Stay on voting page - words will update via WebSocket
       // Small delay to allow vote processing
       await new Promise(resolve => setTimeout(resolve, 100));
+      alert('Mulțumim pentru votul tău!');
     } catch (error) {
       console.error('Error voting:', error);
       alert('Eroare la votare. Te rugăm să încerci din nou.');
@@ -46,50 +63,20 @@ const VotingPage = () => {
     }
   };
 
-  const handlePropose = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newWord.trim()) return;
-
-    setLoading(true);
-    try {
-      await proposeWord(newWord.trim());
-      setNewWord('');
-      // Stay on voting page - words will update via WebSocket
-      // Small delay to allow word to be added
-      await new Promise(resolve => setTimeout(resolve, 100));
-    } catch (error) {
-      console.error('Error proposing word:', error);
-      alert('Eroare la propunerea cuvântului. Te rugăm să încerci din nou.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetVotes = async () => {
-    if (!window.confirm('Ești sigur că vrei să resetezi toate voturile?')) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await resetVotes();
-      // Stay on voting page - words will update via WebSocket
-      await new Promise(resolve => setTimeout(resolve, 100));
-    } catch (error) {
-      console.error('Error resetting votes:', error);
-      alert('Eroare la resetarea voturilor. Te rugăm să încerci din nou.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="voting-page">
       <div className="voting-container">
-        <h1>Votează sau Propune un Cuvânt</h1>
+        <h1>Votează un Cuvânt</h1>
         
+        {hasVoted && (
+          <div className="voted-message">
+            <p>✓ Ai votat deja! Mulțumim pentru participare.</p>
+            <p className="voted-subtext">Poți vedea rezultatele în timp real pe pagina principală.</p>
+          </div>
+        )}
+
         <div className="words-list">
-          <h2>Cuvinte existente</h2>
+          <h2>Cuvinte disponibile</h2>
           {words.length === 0 ? (
             <p className="empty-message">Nu există cuvinte momentan.</p>
           ) : (
@@ -100,10 +87,10 @@ const VotingPage = () => {
                   <span className="word-votes">{word.votes} voturi</span>
                   <button
                     onClick={() => handleVote(word.text)}
-                    disabled={loading}
+                    disabled={loading || hasVoted}
                     className="vote-button"
                   >
-                    Votează
+                    {hasVoted ? 'Ai votat deja' : 'Votează'}
                   </button>
                 </div>
               ))}
@@ -111,36 +98,7 @@ const VotingPage = () => {
           )}
         </div>
 
-        <div className="propose-section">
-          <h2>Propune un cuvânt nou</h2>
-          <form onSubmit={handlePropose} className="propose-form">
-            <input
-              type="text"
-              value={newWord}
-              onChange={(e) => setNewWord(e.target.value)}
-              placeholder="Introdu cuvântul..."
-              disabled={loading}
-              className="word-input"
-              maxLength={50}
-            />
-            <button
-              type="submit"
-              disabled={loading || !newWord.trim()}
-              className="propose-button"
-            >
-              Propune
-            </button>
-          </form>
-        </div>
-
         <div className="actions-section">
-          <button 
-            onClick={handleResetVotes} 
-            disabled={loading}
-            className="reset-button"
-          >
-            Resetează toate voturile
-          </button>
           <button onClick={() => navigate('/')} className="back-button">
             ← Înapoi la Word Cloud
           </button>
