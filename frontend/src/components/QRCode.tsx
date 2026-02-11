@@ -15,7 +15,7 @@ const QRCode = () => {
       <div className="qr-code-wrapper">
         <QRCodeSVG
           value={voteUrl}
-          size={256}
+          size={512}
           level="M"
           bgColor="#ffffff"
           fgColor="#000000"
