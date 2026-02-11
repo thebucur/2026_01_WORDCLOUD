@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Word } from '../types/word';
-import { adminGetStats, adminResetVotes, adminDeleteWord, adminAddWord, AdminStats } from '../services/api';
+import {
+  adminGetStats,
+  adminResetVotes,
+  adminDeleteWord,
+  adminAddWord,
+  createWordList,
+  AdminStats,
+} from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { useWordLists } from '../context/WordListsContext';
 import './AdminPage.css';
 
 const AdminPage = () => {
@@ -11,8 +19,10 @@ const AdminPage = () => {
   const [error, setError] = useState('');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [newWord, setNewWord] = useState('');
+  const [newListName, setNewListName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { refreshLists } = useWordLists();
 
   const handleWordsUpdate = useCallback((newWords: Word[]) => {
     // Update stats when words change via WebSocket
@@ -37,8 +47,8 @@ const AdminPage = () => {
       const statsData = await adminGetStats(password);
       setStats(statsData);
       setIsAuthenticated(true);
-      // Store password in sessionStorage for subsequent requests
       sessionStorage.setItem('adminPassword', password);
+      await refreshLists();
     } catch (err: any) {
       setError('Parolă incorectă. Te rugăm să încerci din nou.');
       setPassword('');
@@ -53,9 +63,10 @@ const AdminPage = () => {
     if (storedPassword) {
       setPassword(storedPassword);
       adminGetStats(storedPassword)
-        .then((statsData) => {
+        .then(async (statsData) => {
           setStats(statsData);
           setIsAuthenticated(true);
+          await refreshLists();
         })
         .catch(() => {
           sessionStorage.removeItem('adminPassword');
@@ -115,6 +126,25 @@ const AdminPage = () => {
     } catch (error) {
       console.error('Error adding word:', error);
       alert('Eroare la adăugarea cuvântului. Te rugăm să încerci din nou.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveListAs = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newListName.trim()) return;
+
+    setLoading(true);
+    try {
+      const adminPassword = sessionStorage.getItem('adminPassword') || password;
+      await createWordList(adminPassword, newListName.trim(), true);
+      setNewListName('');
+      await refreshLists();
+      alert('Lista a fost salvată.');
+    } catch (error) {
+      console.error('Error saving list:', error);
+      alert('Eroare la salvare. Te rugăm să încerci din nou.');
     } finally {
       setLoading(false);
     }
@@ -216,6 +246,28 @@ const AdminPage = () => {
               </table>
             </div>
           )}
+        </div>
+
+        <div className="admin-section">
+          <h2>Salvează lista curentă</h2>
+          <form onSubmit={handleSaveListAs} className="add-word-form">
+            <input
+              type="text"
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              placeholder="Nume listă nouă..."
+              disabled={loading}
+              className="word-input"
+              maxLength={50}
+            />
+            <button
+              type="submit"
+              disabled={loading || !newListName.trim()}
+              className="add-button"
+            >
+              Salvează ca listă nouă
+            </button>
+          </form>
         </div>
 
         <div className="admin-section">

@@ -103,4 +103,46 @@ router.post('/admin/word', authenticateAdmin, (req: Request, res: Response) => {
   }
 });
 
+// Word lists (public read)
+router.get('/lists', (req: Request, res: Response) => {
+  const data = wordStore.getLists();
+  res.json(data);
+});
+
+// Admin: Create a new list
+router.post('/lists', authenticateAdmin, (req: Request, res: Response) => {
+  const { name, copyFromActive } = req.body;
+  const nameStr = typeof name === 'string' ? name : 'Listă nouă';
+  const copy = Boolean(copyFromActive);
+  const list = wordStore.createList(nameStr, copy);
+  res.status(201).json(list);
+});
+
+// Admin: Set active list
+router.put('/lists/active', authenticateAdmin, (req: Request, res: Response) => {
+  const { listId } = req.body;
+  if (!listId || typeof listId !== 'string') {
+    return res.status(400).json({ error: 'listId is required' });
+  }
+  const success = wordStore.setActiveList(listId);
+  if (success) {
+    res.json({ success: true, words: wordStore.getWords(), activeListId: listId });
+  } else {
+    res.status(404).json({ error: 'List not found' });
+  }
+});
+
+// Admin: Delete a list
+router.delete('/lists/:listId', authenticateAdmin, (req: Request, res: Response) => {
+  const { listId } = req.params;
+  const success = wordStore.deleteList(listId);
+  if (success) {
+    res.json({ success: true, lists: wordStore.getLists() });
+  } else {
+    res.status(400).json({
+      error: 'Cannot delete list (not found or cannot delete the last list)',
+    });
+  }
+});
+
 export default router;
