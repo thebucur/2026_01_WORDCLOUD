@@ -14,9 +14,9 @@
   flex-direction: column;
   align-items: center;
   gap: 15px;
-  width: min(50vw, 50vh);
-  min-width: 400px;
-  max-width: 600px;
+  width: min(39vw, 39vh);
+  min-width: 310px;
+  max-width: 465px;
 }
 
 .qr-code-wrapper svg {
