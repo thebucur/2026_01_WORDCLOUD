@@ -9,7 +9,6 @@ import {
 import {
   getWordLists,
   setActiveWordList,
-  WordListMeta,
   WordListsResponse,
 } from '../services/api';
 
