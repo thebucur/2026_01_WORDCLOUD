@@ -4,6 +4,7 @@ import TopBar from './components/TopBar';
 import WordCloud from './components/WordCloud';
 import VotingPage from './components/VotingPage';
 import AdminPage from './components/AdminPage';
+import SuperVoterPage from './components/SuperVoterPage';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<WordCloud />} />
           <Route path="/vote" element={<VotingPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/supervoter" element={<SuperVoterPage />} />
         </Routes>
       </WordListsProvider>
     </Router>

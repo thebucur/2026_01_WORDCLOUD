@@ -5,17 +5,13 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import { isProfanity } from '../utils/profanityFilter';
 import './VotingPage.css';
 
-const VOTED_KEY = 'wordcloud_voted';
-const PROPOSED_KEY = 'wordcloud_proposed';
-
-const VotingPage = () => {
+const SuperVoterPage = () => {
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(false);
-  const [hasVoted, setHasVoted] = useState(false);
-  const [hasProposed, setHasProposed] = useState(false);
   const [proposedWord, setProposedWord] = useState('');
   const [proposeError, setProposeError] = useState('');
   const [proposeLoading, setProposeLoading] = useState(false);
+  const [voteCount, setVoteCount] = useState(0);
 
   const handleWordsUpdate = useCallback((newWords: Word[]) => {
     setWords(newWords);
@@ -26,15 +22,10 @@ const VotingPage = () => {
 
   useEffect(() => {
     loadWords();
-    // Check if user has already voted
-    const voted = localStorage.getItem(VOTED_KEY);
-    if (voted === 'true') {
-      setHasVoted(true);
-    }
-    // Check if user has already proposed
-    const proposed = localStorage.getItem(PROPOSED_KEY);
-    if (proposed === 'true') {
-      setHasProposed(true);
+    // Load vote count from sessionStorage (resets on page refresh)
+    const savedCount = sessionStorage.getItem('supervoter_vote_count');
+    if (savedCount) {
+      setVoteCount(parseInt(savedCount, 10));
     }
   }, []);
 
@@ -48,22 +39,14 @@ const VotingPage = () => {
   };
 
   const handleVote = async (word: string) => {
-    // Check if user has already voted
-    if (hasVoted) {
-      alert('Ai votat deja! Poți vota doar o singură dată.');
-      return;
-    }
-
     setLoading(true);
     try {
       await voteWord(word);
-      // Mark user as voted
-      localStorage.setItem(VOTED_KEY, 'true');
-      setHasVoted(true);
+      const newCount = voteCount + 1;
+      setVoteCount(newCount);
+      sessionStorage.setItem('supervoter_vote_count', newCount.toString());
       // Stay on voting page - words will update via WebSocket
-      // Small delay to allow vote processing
       await new Promise(resolve => setTimeout(resolve, 100));
-      alert('Mulțumim pentru votul tău!');
     } catch (error) {
       console.error('Error voting:', error);
       alert('Eroare la votare. Te rugăm să încerci din nou.');
@@ -74,11 +57,6 @@ const VotingPage = () => {
 
   const handleProposeWord = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (hasProposed) {
-      setProposeError('Ai propus deja un cuvânt! Poți propune doar un singur cuvânt.');
-      return;
-    }
 
     const word = proposedWord.trim();
     
@@ -104,9 +82,6 @@ const VotingPage = () => {
 
     try {
       await proposeWord(word);
-      // Mark user as proposed
-      localStorage.setItem(PROPOSED_KEY, 'true');
-      setHasProposed(true);
       setProposedWord('');
       alert('Cuvântul tău a fost adăugat cu succes!');
     } catch (error: any) {
@@ -132,43 +107,37 @@ const VotingPage = () => {
   return (
     <div className="voting-page">
       <div className="voting-container">
-        <h1>Votează un Cuvânt</h1>
-        <p className="voting-info">Poți vota de până la trei ori.</p>
-        
-        {hasVoted && (
-          <div className="voted-message">
-            <p>✓ Ai votat deja! Mulțumim pentru participare.</p>
-            <p className="voted-subtext">Poți vedea rezultatele în timp real pe pagina principală.</p>
+        <h1>Super Voter</h1>
+        <p className="voting-info" style={{ color: '#667eea', fontWeight: '600' }}>
+          ⚡ Modul Super Voter - Poți vota de nelimitat ori
+        </p>
+        {voteCount > 0 && (
+          <div className="voted-message" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <p>✓ Ai votat de {voteCount} {voteCount === 1 ? 'dată' : 'ori'} în această sesiune.</p>
           </div>
         )}
 
         {/* Propose Word Form */}
         <div className="propose-section">
           <h2>Propune un Cuvânt Nou</h2>
-          {hasProposed ? (
-            <div className="proposed-message">
-              <p>✓ Ai propus deja un cuvânt! Mulțumim pentru contribuție.</p>
-            </div>
-          ) : (
-            <form onSubmit={handleProposeWord} className="propose-form">
-              <input
-                type="text"
-                value={proposedWord}
-                onChange={handleProposedWordChange}
-                placeholder="Introdu un cuvânt..."
-                className="propose-input"
-                disabled={proposeLoading}
-                maxLength={50}
-              />
-              <button
-                type="submit"
-                disabled={proposeLoading || !proposedWord.trim()}
-                className="propose-button"
-              >
-                {proposeLoading ? 'Se adaugă...' : 'Propune'}
-              </button>
-            </form>
-          )}
+          <form onSubmit={handleProposeWord} className="propose-form">
+            <input
+              type="text"
+              value={proposedWord}
+              onChange={handleProposedWordChange}
+              placeholder="Introdu un cuvânt..."
+              className="propose-input"
+              disabled={proposeLoading}
+              maxLength={50}
+            />
+            <button
+              type="submit"
+              disabled={proposeLoading || !proposedWord.trim()}
+              className="propose-button"
+            >
+              {proposeLoading ? 'Se adaugă...' : 'Propune'}
+            </button>
+          </form>
           {proposeError && (
             <div className="propose-error">
               {proposeError}
@@ -188,10 +157,10 @@ const VotingPage = () => {
                   <span className="word-votes">{word.votes} voturi</span>
                   <button
                     onClick={() => handleVote(word.text)}
-                    disabled={loading || hasVoted}
+                    disabled={loading}
                     className="vote-button"
                   >
-                    {hasVoted ? 'Ai votat deja' : 'Votează'}
+                    Votează
                   </button>
                 </div>
               ))}
@@ -203,4 +172,4 @@ const VotingPage = () => {
   );
 };
 
-export default VotingPage;
+export default SuperVoterPage;
