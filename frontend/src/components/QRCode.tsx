@@ -1,7 +1,10 @@
 import QRCodeSVG from 'react-qr-code';
+import { useQRCodeVisibility } from '../context/QRCodeVisibilityContext';
 import './QRCode.css';
 
 const QRCode = () => {
+  const { toggleVisibility } = useQRCodeVisibility();
+
   // Get the current URL and change path to /vote
   const getVoteUrl = () => {
     const currentUrl = window.location.origin;
@@ -21,6 +24,14 @@ const QRCode = () => {
           fgColor="#000000"
         />
         <div className="qr-code-label">Scanează pentru a vota</div>
+        <button
+          type="button"
+          onClick={toggleVisibility}
+          className="qr-code-hide-btn"
+          title="Ascunde codul QR"
+        >
+          Ascunde
+        </button>
       </div>
     </div>
   );

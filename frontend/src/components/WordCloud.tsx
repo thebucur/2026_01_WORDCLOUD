@@ -8,7 +8,7 @@ import QRCode from './QRCode';
 import './WordCloud.css';
 
 const WordCloud = () => {
-  const { isVisible } = useQRCodeVisibility();
+  const { isVisible, toggleVisibility } = useQRCodeVisibility();
   const [words, setWords] = useState<Word[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -125,7 +125,18 @@ const WordCloud = () => {
           );
         })}
       </div>
-      {isVisible && <QRCode />}
+      {isVisible ? (
+        <QRCode />
+      ) : (
+        <button
+          type="button"
+          onClick={toggleVisibility}
+          className="qr-code-show-btn"
+          title="Arată codul QR"
+        >
+          📱 Arată codul QR
+        </button>
+      )}
     </div>
   );
 };

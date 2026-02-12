@@ -30,3 +30,38 @@
   font-weight: 600;
   text-align: center;
 }
+
+.qr-code-hide-btn {
+  margin-top: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f5f5f5;
+  cursor: pointer;
+  color: #333;
+}
+
+.qr-code-hide-btn:hover {
+  background: #e8e8e8;
+}
+
+.qr-code-show-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 12px 20px;
+  font-size: 14px;
+  border: 1px solid #667eea;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.qr-code-show-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
