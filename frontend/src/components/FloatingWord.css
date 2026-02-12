@@ -67,9 +67,9 @@
   filter: blur(0.8px);
   animation: float-dreamy-subtle-discrete 30.72s infinite ease-in-out;
   will-change: transform;
-  /* Ensure center word is properly centered */
+  /* Ensure center word is properly centered - aligned with text field centers */
   left: 50% !important;
-  top: 50% !important;
+  top: 42% !important;
 }
 
 /* When center word has transition, pause the normal animation */
@@ -87,23 +87,23 @@
 @keyframes circular-orbit {
   0% {
     left: var(--x0, 50%);
-    top: var(--y0, 50%);
+    top: var(--y0, 42%);
   }
   25% {
     left: var(--x25, 50%);
-    top: var(--y25, 50%);
+    top: var(--y25, 42%);
   }
   50% {
     left: var(--x50, 50%);
-    top: var(--y50, 50%);
+    top: var(--y50, 42%);
   }
   75% {
     left: var(--x75, 50%);
-    top: var(--y75, 50%);
+    top: var(--y75, 42%);
   }
   100% {
     left: var(--x100, 50%);
-    top: var(--y100, 50%);
+    top: var(--y100, 42%);
   }
 }
 

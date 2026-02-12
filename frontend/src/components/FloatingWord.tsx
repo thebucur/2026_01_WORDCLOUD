@@ -93,7 +93,7 @@ const FloatingWord = ({ word, votes, maxVotes, isLargest, index, onInitialized }
   const baseDuration = isLargest ? 51.2 : (15 + (index % 10) * 1) * 2.56; // 38.4-64s for orbiting words (additional 60% slower)
   const delay = index * 0.768; // Stagger the animations (additional 60% slower)
   
-  // Generate circular orbit parameters - all words orbit around the center (50%, 50%)
+  // Generate circular orbit parameters - all words orbit around the center (50% horizontal, 42% vertical - aligned with text field centers)
   // Use useRef to store initial values so they don't recalculate on every render
   // This prevents animation restarts when votes change
   const orbitConfigRef = useRef<{
@@ -141,11 +141,11 @@ const FloatingWord = ({ word, votes, maxVotes, isLargest, index, onInitialized }
         const ellipseFactorX = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
         const ellipseFactorY = 0.8 + Math.random() * 0.4; // 0.8 to 1.2
         
-        // Pre-calculate positions for key points in the circular orbit around center (50%, 50%)
+        // Pre-calculate positions for key points in the circular orbit around center (50% horizontal, 42% vertical - aligned with text field centers)
         const calcPosition = (angleDeg: number) => {
           const angleRad = (angleDeg * Math.PI) / 180;
           const x = 50 + orbitRadius * ellipseFactorX * Math.cos(angleRad);
-          const y = 50 + orbitRadius * ellipseFactorY * Math.sin(angleRad);
+          const y = 42 + orbitRadius * ellipseFactorY * Math.sin(angleRad); // Orbit around 42% vertical center
           return { x, y };
         };
         
@@ -218,12 +218,12 @@ const FloatingWord = ({ word, votes, maxVotes, isLargest, index, onInitialized }
     } else if (isLargest) {
       // Clear orbit config when word becomes largest
       orbitConfigRef.current = null;
-      // Ensure center word is properly positioned
+      // Ensure center word is properly positioned - aligned with text field centers
       if (wordRef.current) {
         requestAnimationFrame(() => {
           if (wordRef.current && isLargest) {
             wordRef.current.style.left = '50%';
-            wordRef.current.style.top = '50%';
+            wordRef.current.style.top = '42%'; // Aligned with typical text field center
             
             // Notify parent that this word is initialized (center words don't have delay)
             if (!hasNotifiedInitRef.current && onInitialized) {
@@ -245,10 +245,10 @@ const FloatingWord = ({ word, votes, maxVotes, isLargest, index, onInitialized }
     animationDelay: `${delay}s`,
     zIndex: isLargest ? 100 : Math.floor(votes),
     position: 'absolute',
-    // Center word is always at 50% 50% (handled by CSS !important)
-    // Non-center words start at 50% 50% and are animated by CSS
+    // Center word is at 50% horizontal, 42% vertical (aligned with text field centers)
+    // Non-center words start at 50% 42% and are animated by CSS
     left: '50%',
-    top: '50%',
+    top: isLargest ? '42%' : '42%',
   };
 
   // Calculate badge size proportionally larger - about 45% of font size (80% larger than before)
