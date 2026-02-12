@@ -43,7 +43,9 @@ router.post('/propose', (req: Request, res: Response) => {
   }
 
   // Get user identifier (IP address or session ID)
-  const userId = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const forwardedIp = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
+  const userId = req.ip || forwardedIp || req.socket.remoteAddress || 'unknown';
   
   // Check if user has already proposed a word
   if (wordStore.hasUserProposed(userId)) {
