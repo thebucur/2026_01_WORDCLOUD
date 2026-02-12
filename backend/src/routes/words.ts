@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { wordStore } from '../store';
+import { isProfanity } from '../utils/profanityFilter';
 
 const router = Router();
 
@@ -31,9 +32,28 @@ router.post('/propose', (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Word is required' });
   }
 
+  // Check if word contains spaces (must be single word)
+  if (word.trim().includes(' ')) {
+    return res.status(400).json({ error: 'Only single words are allowed' });
+  }
+
+  // Check for profanity
+  if (isProfanity(word)) {
+    return res.status(400).json({ error: 'Profanity is not allowed' });
+  }
+
+  // Get user identifier (IP address or session ID)
+  const userId = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  
+  // Check if user has already proposed a word
+  if (wordStore.hasUserProposed(userId)) {
+    return res.status(400).json({ error: 'You have already proposed a word' });
+  }
+
   const success = wordStore.addWord(word);
   
   if (success) {
+    wordStore.markUserProposed(userId);
     res.json({ success: true, words: wordStore.getWords() });
   } else {
     res.status(400).json({ error: 'Invalid word' });

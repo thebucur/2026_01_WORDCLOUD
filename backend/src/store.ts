@@ -34,6 +34,7 @@ class WordStore {
   private lists: Map<string, { name: string; words: Map<string, number> }> = new Map();
   private activeListId: string = '';
   private clients: Set<WebSocket> = new Set();
+  private userProposals: Set<string> = new Set(); // Track users who have proposed words
 
   constructor() {
     const defaultId = randomUUID();
@@ -82,6 +83,14 @@ class WordStore {
       return true;
     }
     return this.voteWord(normalizedWord);
+  }
+
+  hasUserProposed(userId: string): boolean {
+    return this.userProposals.has(userId);
+  }
+
+  markUserProposed(userId: string): void {
+    this.userProposals.add(userId);
   }
 
   resetAllVotes(): void {
