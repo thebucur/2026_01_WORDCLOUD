@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { WordListsProvider } from './context/WordListsContext';
+import { QRCodeVisibilityProvider } from './context/QRCodeVisibilityContext';
 import TopBar from './components/TopBar';
 import WordCloud from './components/WordCloud';
 import VotingPage from './components/VotingPage';
@@ -27,7 +28,9 @@ function App() {
   return (
     <Router>
       <WordListsProvider>
-        <AppContent />
+        <QRCodeVisibilityProvider>
+          <AppContent />
+        </QRCodeVisibilityProvider>
       </WordListsProvider>
     </Router>
   );

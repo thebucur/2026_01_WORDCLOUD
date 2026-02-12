@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Word } from '../types/word';
 import { getWords } from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { useQRCodeVisibility } from '../context/QRCodeVisibilityContext';
 import FloatingWord from './FloatingWord';
 import QRCode from './QRCode';
 import './WordCloud.css';
 
 const WordCloud = () => {
+  const { isVisible } = useQRCodeVisibility();
   const [words, setWords] = useState<Word[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -123,7 +125,7 @@ const WordCloud = () => {
           );
         })}
       </div>
-      <QRCode />
+      {isVisible && <QRCode />}
     </div>
   );
 };

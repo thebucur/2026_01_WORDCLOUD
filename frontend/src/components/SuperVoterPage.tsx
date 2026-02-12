@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Word } from '../types/word';
 import { getWords, voteWord, proposeWord } from '../services/api';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { isProfanity } from '../utils/profanityFilter';
+import { useQRCodeVisibility } from '../context/QRCodeVisibilityContext';
 import './VotingPage.css';
 
 const SuperVoterPage = () => {
+  const { isVisible, toggleVisibility } = useQRCodeVisibility();
   const [words, setWords] = useState<Word[]>([]);
   const [loading, setLoading] = useState(false);
   const [proposedWord, setProposedWord] = useState('');
@@ -111,6 +114,19 @@ const SuperVoterPage = () => {
         <p className="voting-info" style={{ color: '#667eea', fontWeight: '600' }}>
           ⚡ Modul Super Voter - Poți vota de nelimitat ori
         </p>
+        <div style={{ marginBottom: '16px', display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={toggleVisibility}
+            className="propose-button"
+            style={{ fontSize: '14px', padding: '8px 16px' }}
+          >
+            {isVisible ? '🔲 Ascunde codul QR (pagina principală)' : '📱 Arată codul QR (pagina principală)'}
+          </button>
+          <Link to="/" style={{ fontSize: '14px', color: '#667eea' }}>
+            Vezi pagina principală →
+          </Link>
+        </div>
         {voteCount > 0 && (
           <div className="voted-message" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
             <p>✓ Ai votat de {voteCount} {voteCount === 1 ? 'dată' : 'ori'} în această sesiune.</p>
