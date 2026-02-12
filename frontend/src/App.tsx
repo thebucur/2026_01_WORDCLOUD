@@ -9,7 +9,7 @@ import SuperVoterPage from './components/SuperVoterPage';
 
 function AppContent() {
   const location = useLocation();
-  const showTopBar = location.pathname !== '/';
+  const showTopBar = location.pathname !== '/' && location.pathname !== '/vote';
 
   return (
     <>
